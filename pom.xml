@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <artifactId>cassandra-maven-plugin</artifactId>
-  <version>3.8-SNAPSHOT</version>
+  <version>3.8-goto-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Mojo's Cassandra Maven Plugin</name>
