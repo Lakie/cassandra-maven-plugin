@@ -1,9 +1,6 @@
 package org.codehaus.mojo.cassandra;
 
-import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.InvalidRequestException;
-import org.apache.cassandra.thrift.SchemaDisagreementException;
-import org.apache.thrift.TException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.Cassandra;
 
 public abstract class ThriftApiOperation {
   

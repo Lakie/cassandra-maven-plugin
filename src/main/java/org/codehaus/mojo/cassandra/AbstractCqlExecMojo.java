@@ -1,28 +1,24 @@
 package org.codehaus.mojo.cassandra;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.FileInputStream;
-import java.nio.charset.Charset;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.apache.cassandra.cql3.CqlLexer;
-import org.apache.cassandra.thrift.Cassandra.Client;
-import org.apache.cassandra.thrift.Compression;
-import org.apache.cassandra.thrift.ConsistencyLevel;
-import org.apache.cassandra.thrift.CqlResult;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.Cassandra;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.Compression;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.ConsistencyLevel;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.CqlResult;
 import org.codehaus.plexus.util.IOUtil;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Abstract parent class for mojos that need to run CQL statements.
@@ -158,7 +154,7 @@ public abstract class AbstractCqlExecMojo extends AbstractCassandraMojo
         }
 
         @Override
-        void executeOperation(Client client) throws ThriftApiExecutionException
+        void executeOperation(Cassandra.Client client) throws ThriftApiExecutionException
         {
             for (String statement : statements)
             {
@@ -172,7 +168,7 @@ public abstract class AbstractCqlExecMojo extends AbstractCassandraMojo
             }
         }
 
-        private CqlResult executeStatement(Client client, String statement) throws ThriftApiExecutionException
+        private CqlResult executeStatement(Cassandra.Client client, String statement) throws ThriftApiExecutionException
         {
             ByteBuffer buf = ByteBufferUtil.bytes(statement);
             try

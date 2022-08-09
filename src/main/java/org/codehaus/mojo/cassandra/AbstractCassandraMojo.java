@@ -57,6 +57,15 @@ public abstract class AbstractCassandraMojo
     extends AbstractMojo
 {
     /**
+     * If <code>true</code>, the java options --add-exports and --add-opens will be added to the cassandra start. Which
+     * is needed, if cassandra runs with a Java runtime &gt;= 11
+     *
+     * @since 3.7
+     */
+    @Parameter(property="cassandra.addJdk11Options", defaultValue="false")
+    protected boolean addJdk11Options;
+
+    /**
      * The directory to hold cassandra's database.
      */
     @Parameter(defaultValue = "${project.build.directory}/cassandra")
@@ -65,7 +74,7 @@ public abstract class AbstractCassandraMojo
     /**
      * The enclosing project.
      */
-    @Parameter(readonly = true)
+    @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
 
     /**
@@ -245,7 +254,8 @@ public abstract class AbstractCassandraMojo
 
 
     protected boolean useJdk11Options() {
-        return false;
+//        getLog().debug("abstract mojo working............");
+        return addJdk11Options;
     }
 
     /**
@@ -392,6 +402,12 @@ public abstract class AbstractCassandraMojo
             getLog().debug( ( log4jClientConfig.isFile() ? "Updating " : "Creating " ) + log4jClientConfig );
             FileUtils.copyURLToFile( getClass().getResource("/log4j2.xml"), log4jClientConfig );
         }
+        File cassandraRackdcProperties = new File( conf, "cassandra-rackdc.properties" );
+        if ( Utils.shouldGenerateResource( project, cassandraRackdcProperties ) )
+        {
+            getLog().debug( ( cassandraRackdcProperties.isFile() ? "Updating " : "Creating " ) + cassandraRackdcProperties );
+            FileUtils.copyURLToFile( getClass().getResource("/cassandra-rackdc.properties"), cassandraRackdcProperties );
+        }
         File cassandraJar = new File( bin, "cassandra.jar" );
         if ( Utils.shouldGenerateResource( project, cassandraJar ) )
         {
@@ -452,7 +468,7 @@ public abstract class AbstractCassandraMojo
         config.append( "listen_address: " ).append( listenAddress ).append( "\n" );
         config.append( "storage_port: " ).append( storagePort ).append( "\n" );
         config.append( "rpc_address: " ).append( rpcAddress ).append( "\n" );
-        config.append( "rpc_port: " ).append( rpcPort ).append( "\n" );
+//        config.append( "rpc_port: " ).append( rpcPort ).append( "\n" );
         config.append( "native_transport_port: " ).append( nativeTransportPort ).append( "\n" );
         config.append( "start_native_transport: " ).append( startNativeTransport ).append( "\n" );
         if ( seeds != null )
@@ -593,8 +609,10 @@ public abstract class AbstractCassandraMojo
         CommandLine commandLine = newJavaCommandLine();
         commandLine.addArgument( "-Xmx" + maxMemory + "m" );
 
+        getLog().debug("useJdk11Options = "+useJdk11Options());
         if (useJdk11Options())
         {
+            getLog().debug("JDK11+ options adding to command line");
             commandLine.addArgument( "-Djdk.attach.allowAttachSelf=true" );
             commandLine.addArgument( "--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED" );
             commandLine.addArgument( "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED" );
@@ -654,7 +672,9 @@ public abstract class AbstractCassandraMojo
         // It seems that java cannot handle quoted jar file names...
         commandLine.addArgument( new File( new File( cassandraDir, "bin" ), "cassandra.jar" ).getAbsolutePath(),
                                  false );
-
+       getLog().debug("==========================================================================");
+       getLog().debug("commandLineArguments:" + Arrays.deepToString(commandLine.getArguments()));
+       getLog().debug("==========================================================================");
         return commandLine;
     }
 

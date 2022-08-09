@@ -1,10 +1,10 @@
 package org.codehaus.mojo.cassandra;
 
-import org.apache.cassandra.thrift.UnavailableException;
-import org.apache.cassandra.thrift.InvalidRequestException;
-import org.apache.cassandra.thrift.SchemaDisagreementException;
-import org.apache.cassandra.thrift.TimedOutException;
 import org.apache.thrift.TException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.InvalidRequestException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.SchemaDisagreementException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.TimedOutException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.UnavailableException;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +23,7 @@ public class ThriftApiExecutionExceptionTest {
 
         assertThat(exception)
                 .hasMessage("There was a problem calling Apache Cassandra's Thrift API. additional message")
-        .hasCause(exception.getCause());
+                .hasCause(exception.getCause());
     }
 
     @Test

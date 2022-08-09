@@ -1,9 +1,9 @@
 package org.codehaus.mojo.cassandra;
 
-import org.apache.cassandra.thrift.InvalidRequestException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.InvalidRequestException;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.internal.stubbing.answers.DoesNothing.doesNothing;
 
 public class CqlExecCassandraMojoPowerMockTest {

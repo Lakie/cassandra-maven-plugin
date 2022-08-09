@@ -18,22 +18,21 @@
  */
 package org.codehaus.mojo.cassandra;
 
-import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.InvalidRequestException;
 
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.DefaultDriverOption;
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import org.apache.commons.exec.*;
-
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.Cassandra;
 import org.codehaus.plexus.util.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -42,7 +41,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -162,6 +163,7 @@ public final class Utils
             LogOutputStream stderr = new MavenLogOutputStream(log);
 
             log.debug("Executing command line: " + commandLine);
+            log.debug("environment: " + environment.entrySet());
 
             exec.setStreamHandler(new PumpStreamHandler(stdout, stderr));
 
@@ -244,44 +246,34 @@ public final class Utils
         long maxWaiting = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(startWaitSeconds);
         while (startWaitSeconds == 0 || System.currentTimeMillis() < maxWaiting)
         {
-            TTransport tr = new TFramedTransport(new TSocket(rpcAddress, rpcPort));
-            try
-            {
-                TProtocol proto = new TBinaryProtocol(tr);
-                Cassandra.Client client = new Cassandra.Client(proto);
-                try
-                {
-                    tr.open();
-                } catch (TTransportException e)
-                {
-                    if (!(e.getCause() instanceof ConnectException))
-                    {
-                        log.debug(e.getLocalizedMessage(), e);
-                    }
-                    try
-                    {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e1)
-                    {
-                        // ignore
-                    }
-                    continue;
-                }
-                try
-                {
-                    log.info("Cassandra cluster \"" + client.describe_cluster_name() + "\" started.");
-                    return true;
-                } catch (TException e)
-                {
-                    throw new MojoExecutionException(e.getLocalizedMessage(), e);
-                }
-            } finally
-            {
-                if (tr.isOpen())
-                {
-                    tr.close();
+            log.debug("TTransport initialization....");
+
+            DriverConfigLoader configLoader = DriverConfigLoader.programmaticBuilder()
+                    .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(0))
+                    .build();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) {
+
+            }
+            log.debug("++++++++++++++++++++++++++++++++++++++++++++");
+            try {
+                        CqlSession.builder()
+                        .addContactPoint(new InetSocketAddress(rpcAddress, rpcPort))
+                        .withConfigLoader(configLoader)
+                        .withLocalDatacenter("DC1")
+                        .build()
+                        .execute("SELECT * FROM system_virtual_schema.tables");
+                return true;
+            }catch (Exception e){
+                log.debug("Not arrived.........", e);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+
                 }
             }
+
         }
         return false;
     }
@@ -305,7 +297,6 @@ public final class Utils
             {
                 cassandraClient.set_keyspace(thriftApiOperation.getKeyspace());
             }
-            cassandraClient.set_cql_version(thriftApiOperation.getCqlVersion());
             thriftApiOperation.executeOperation(cassandraClient);
         } catch (ThriftApiExecutionException taee) 
         {

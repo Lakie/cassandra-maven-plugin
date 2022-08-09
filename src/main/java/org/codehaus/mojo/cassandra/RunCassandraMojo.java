@@ -26,9 +26,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.cassandraunit.DataLoader;
-import org.cassandraunit.dataset.FileDataSet;
+import org.cassandraunit.CQLDataLoader;
 import org.cassandraunit.dataset.ParseException;
+import org.cassandraunit.dataset.cql.FileCQLDataSet;
+import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 
 /**
  * Runs Cassandra in the foreground.
@@ -106,8 +107,9 @@ public class RunCassandraMojo
                     getLog().info( "Loading CassandraUnit dataSet " + cuDataSet + "..." );
                     try
                     {
-                        DataLoader dataLoader = new DataLoader( "cassandraUnitCluster", rpcAddress + ":" + rpcPort );
-                        dataLoader.load( new FileDataSet( cuDataSet.getAbsolutePath() ) );
+                        FileCQLDataSet fileCQLDataSet = new FileCQLDataSet(cuDataSet.getAbsolutePath());
+                        CQLDataLoader dataLoader = new CQLDataLoader(EmbeddedCassandraServerHelper.getSession());
+                        dataLoader.load(fileCQLDataSet);
                     }
                     catch ( ParseException e )
                     {

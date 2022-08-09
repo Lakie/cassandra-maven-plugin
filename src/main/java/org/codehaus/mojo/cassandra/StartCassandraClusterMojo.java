@@ -23,9 +23,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.cassandraunit.DataLoader;
-import org.cassandraunit.dataset.FileDataSet;
+import org.cassandraunit.CQLDataLoader;
 import org.cassandraunit.dataset.ParseException;
+import org.cassandraunit.dataset.cql.FileCQLDataSet;
+import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,21 +88,6 @@ public class StartCassandraClusterMojo
      */
     @Parameter(property="cassandra.cluster.size", defaultValue="4")
     private int clusterSize;
-
-    /**
-     * If <code>true</code>, the java options --add-exports and --add-opens will be added to the cassandra start. Which
-     * is needed, if cassandra runs with a Java runtime &gt;= 11
-     *
-     * @since 3.7
-     */
-    @Parameter(property="cassandra.addJdk11Options", defaultValue="false")
-    protected boolean addJdk11Options;
-
-    @Override
-    protected boolean useJdk11Options( )
-    {
-        return addJdk11Options;
-    }
 
     /**
      * {@inheritDoc}
@@ -183,8 +169,9 @@ public class StartCassandraClusterMojo
                 getLog().info( "Loading CassandraUnit dataSet " + cuDataSet + "..." );
                 try
                 {
-                    DataLoader dataLoader = new DataLoader( "cassandraUnitCluster", rpcAddress + ":" + rpcPort );
-                    dataLoader.load( new FileDataSet( cuDataSet.getAbsolutePath() ) );
+                    FileCQLDataSet fileCQLDataSet = new FileCQLDataSet(cuDataSet.getAbsolutePath());
+                    CQLDataLoader dataLoader = new CQLDataLoader(EmbeddedCassandraServerHelper.getSession());
+                    dataLoader.load(fileCQLDataSet);
                 }
                 catch ( ParseException e )
                 {

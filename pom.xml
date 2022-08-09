@@ -98,7 +98,9 @@ under the License.
 
   <properties>
     <mavenVersion>3.2.5</mavenVersion>
-    <cassandraVersion>3.11.13</cassandraVersion>
+    <cassandraVersion>4.0.5</cassandraVersion>
+    <cassandraUnitVersion>4.3.1.0</cassandraUnitVersion>
+    <datastaxVersion>4.14.1</datastaxVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <log4jVersion>2.18.0</log4jVersion>
     <commonsLoggingVersion>1.2</commonsLoggingVersion>
@@ -121,10 +123,6 @@ under the License.
           <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.thrift</groupId>
-          <artifactId>libthrift</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
@@ -133,11 +131,6 @@ under the License.
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cassandra</groupId>
-      <artifactId>cassandra-thrift</artifactId>
-      <version>${cassandraVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -192,7 +185,7 @@ under the License.
     <dependency>
       <groupId>org.cassandraunit</groupId>
       <artifactId>cassandra-unit-shaded</artifactId>
-      <version>4.3.1.0</version>
+      <version>${cassandraUnitVersion}</version>
       <exclusions>
         <exclusion>
           <groupId>ch.qos.logback</groupId>
@@ -203,7 +196,22 @@ under the License.
     <dependency>
       <groupId>com.datastax.oss</groupId>
       <artifactId>java-driver-core-shaded</artifactId>
-      <version>4.14.1</version>
+      <version>${datastaxVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.datastax.oss</groupId>
+      <artifactId>java-driver-query-builder</artifactId>
+      <version>${datastaxVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tinkerpop.gremlin</groupId>
+      <artifactId>gremlin-java</artifactId>
+      <version>2.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.esri.geometry</groupId>
+      <artifactId>esri-geometry-api</artifactId>
+      <version>2.2.4</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>
@@ -236,17 +244,6 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.cassandraunit</groupId>
-      <artifactId>cassandra-unit</artifactId>
-      <version>1.0.3.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
@@ -273,6 +270,21 @@ under the License.
       <artifactId>assertj-core</artifactId>
       <version>3.23.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4jVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4jVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>5.12.1</version>
     </dependency>
   </dependencies>
 
@@ -335,16 +347,6 @@ under the License.
       </plugins>
     </pluginManagement>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4jVersion}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <profiles>
     <profile>

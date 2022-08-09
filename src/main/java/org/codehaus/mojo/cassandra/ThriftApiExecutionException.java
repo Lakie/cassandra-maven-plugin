@@ -1,10 +1,10 @@
 package org.codehaus.mojo.cassandra;
 
-import org.apache.cassandra.thrift.InvalidRequestException;
-import org.apache.cassandra.thrift.SchemaDisagreementException;
-import org.apache.cassandra.thrift.TimedOutException;
-import org.apache.cassandra.thrift.UnavailableException;
 import org.apache.thrift.TException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.InvalidRequestException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.SchemaDisagreementException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.TimedOutException;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.UnavailableException;
 
 /**
  * Exception to wrap the various Exceptions that can come back 
@@ -38,11 +38,11 @@ public class ThriftApiExecutionException extends RuntimeException
     private static String deduceExceptionMessage(Throwable t)
     {
         StringBuilder msg = new StringBuilder("Details: ");
-        if ( t instanceof UnavailableException )
+        if ( t instanceof UnavailableException)
             msg.append("You do not have enough nodes up to handle the specified consistency level");
-        else if ( t instanceof TimedOutException )
+        else if ( t instanceof TimedOutException)
             msg.append("Request timed out - server load may be too high, or you may be requesting too many rows for a single operation");
-        else if ( t instanceof InvalidRequestException )
+        else if ( t instanceof InvalidRequestException)
             msg.append("The request was not properly formatted ").append(((InvalidRequestException) t).getWhy());
         else if ( t instanceof SchemaDisagreementException)
             msg.append("Schema versions are out of sync");

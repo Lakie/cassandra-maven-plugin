@@ -28,6 +28,7 @@ public abstract class AbstractCqlLoadMojo extends AbstractCqlExecMojo
 
     protected void execCqlFile() throws MojoExecutionException
     {
+        getLog().debug("execCqlFile, file path: " + script);
         if (script != null)
         {
             getLog().info("Running " + script + "...");

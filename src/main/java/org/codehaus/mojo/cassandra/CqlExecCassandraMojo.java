@@ -7,14 +7,14 @@ import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TypeParser;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.thrift.Column;
-import org.apache.cassandra.thrift.CqlResult;
-import org.apache.cassandra.thrift.CqlRow;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.Column;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.CqlResult;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.CqlRow;
 
 /**
  * Executes cql statements from maven.

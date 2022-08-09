@@ -1,14 +1,14 @@
 package org.codehaus.mojo.cassandra;
 
-import org.apache.cassandra.thrift.Cassandra.Client;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.cassandraunit.shaded.org.apache.cassandra.thrift.Cassandra;
 
 /**
- * Drop the specified ColumnFamilies or, if no arguments are given, 
- * the specified Keyspace 
- * 
+ * Drop the specified ColumnFamilies or, if no arguments are given,
+ * the specified Keyspace
+ *
  * @author zznate
  *
  */
@@ -16,7 +16,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class DropColumnFamiliesMojo extends AbstractSchemaCassandraMojo {
 
     /**
-     * The one or more comma-delimited ColumnFamilies against to be dropped. 
+     * The one or more comma-delimited ColumnFamilies against to be dropped.
      * If not specified, the Keyspace will be dropped.
      */
     @Parameter(property="cassandra.columnFamilies")
@@ -24,10 +24,10 @@ public class DropColumnFamiliesMojo extends AbstractSchemaCassandraMojo {
 
 
     @Override
-    protected ThriftApiOperation buildOperation() 
+    protected ThriftApiOperation buildOperation()
     {
         DropCfOperation dropCfOp = new DropCfOperation(rpcAddress, rpcPort);
-        dropCfOp.setKeyspace(keyspace);        
+        dropCfOp.setKeyspace(keyspace);
         return dropCfOp;
     }
 
@@ -35,18 +35,18 @@ public class DropColumnFamiliesMojo extends AbstractSchemaCassandraMojo {
 
     protected void parseArguments() throws IllegalArgumentException
     {
-        if (StringUtils.isNotBlank(keyspace)) 
+        if (StringUtils.isNotBlank(keyspace))
         {
             // keyspace is a required parameter but somebody could provide -Dkeyspace=
             // which would cause issues
             throw new IllegalArgumentException("The keyspace to drop column families from cannot be empty");
         }
-    
+
         columnFamilyList = StringUtils.split(columnFamilies, ',');
     }
-        
 
-    class DropCfOperation extends ThriftApiOperation 
+
+    class DropCfOperation extends ThriftApiOperation
     {
 
         public DropCfOperation(String rpcAddress, int rpcPort)
@@ -55,23 +55,23 @@ public class DropColumnFamiliesMojo extends AbstractSchemaCassandraMojo {
         }
 
         @Override
-        public void executeOperation(Client client) throws ThriftApiExecutionException
+        public void executeOperation(Cassandra.Client client) throws ThriftApiExecutionException
         {
             try {
-                if ( columnFamilyList != null && columnFamilyList.length > 0 ) 
+                if ( columnFamilyList != null && columnFamilyList.length > 0 )
                 {
                     for (String s : columnFamilyList)
                     {
                         client.system_drop_column_family(s);
                         getLog().info("Dropped column family \"" + s + "\".");
                     }
-                } 
-                else 
+                }
+                else
                 {
                     client.system_drop_keyspace(keyspace);
                     getLog().info("Dropped keyspace \"" + keyspace + "\".");
                 }
-            } catch (Exception e) 
+            } catch (Exception e)
             {
                 throw new ThriftApiExecutionException(e);
             }
